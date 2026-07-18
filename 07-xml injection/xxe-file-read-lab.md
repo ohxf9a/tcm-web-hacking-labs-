@@ -8,6 +8,28 @@ XXE (XML External Entity Injection) is a vulnerability that occurs when XML pars
 
 Retrieve the /etc/passwd file from the target server using XXE injection.
 
+## Screenshots
+
+### Lab Environment Setup
+
+![Burp Suite - Initial Request and Response](images/01-burp-initial-request.png)
+*Figure 1: Burp Suite showing the initial POST request to /product/stock and the response with stock quantity 367*
+
+### Identifying XML Endpoint
+
+![XML Request Structure](images/02-xml-request.png)
+*Figure 2: The application accepts XML input with productId and storeId elements*
+
+### XXE Payload and Exploitation
+
+![XXE Payload Injection](images/03-xxe-payload.png)
+*Figure 3: Injecting the XXE payload to read /etc/passwd*
+
+### Successful File Disclosure
+
+![/etc/passwd Output](images/04-etc-passwd-output.png)
+*Figure 4: Successful retrieval of /etc/passwd showing system user accounts*
+
 ## Attack Methodology
 
 ### Reconnaissance Phase
@@ -81,52 +103,25 @@ Retrieve the /etc/passwd file from the target server using XXE injection.
 | PayloadsAllTheThings | XXE wordlist |
 | HackTricks | XML injection references |
 
+## Lab Progression Structure
 
-## Key Takeaways
+| Step | Milestone | Status |
+|------|-----------|--------|
+| 1 | Identify XML endpoint | Complete |
+| 2 | Test basic XXE | Complete |
+| 3 | Read /etc/passwd | Complete |
+| 4 | Enumerate users | Complete |
+| 5 | Find sensitive files | Pending |
+| 6 | Escalate to RCE (if possible) | Pending |
+| 7 | Document findings | Complete |
 
-| # | Takeaway |
-|---|----------|
-| 1 | XML parsers process entities even when unused by the application |
-| 2 | The DOCTYPE declaration is the injection point |
-| 3 | Entity references must be properly formed with semicolons |
-| 4 | Different systems require different file paths |
-| 5 | Information disclosure leads to privilege escalation paths |
-| 6 | Blind XXE requires OOB or error-based techniques |
+## Extracted User Information
 
-## References for Further Study
-
-- OWASP XXE Prevention Cheat Sheet
-- PortSwigger Web Security Academy - XXE labs
-- HackTricks - XML External Entity
-- PayloadsAllTheThings - XXE Injection
-
----
-
-## Notes on Screenshots
-
-### Should You Add Screenshots?
-
-**Yes, include screenshots for:**
-
-| Screenshot Type | What to Show |
-|-----------------|--------------|
-| Burp Request | The XXE payload in Repeater |
-| Burp Response | /etc/passwd contents in response |
-| Lab Dashboard | Completed lab status |
-| Successful Output | Key extracted data highlighted |
-
-**Suggested Screenshots:**
-
-1. **Burp Request with Payload**
-   - Show the XML payload with DOCTYPE declaration
-   - Highlight the injected entity reference
-
-2. **Burp Response with Output**
-   - Show the /etc/passwd file contents
-   - Highlight user accounts found
-
-3. **Lab Completion**
-   - Show the lab dashboard with green checkmark
-   - Shows the lab is solved
-
-### Screenshot Organization
+```bash
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+peter:x:12001:12001:/home/peter:/bin/bash
+carlos:x:12002:12002:/home/carlos:/bin/bash
+user:x:12000:12000:/home/user:/bin/bash
+elmer:x:12099:12099:/home/elmer:/bin/bash
+academy:x:10000:10000:/academy:/bin/bash
