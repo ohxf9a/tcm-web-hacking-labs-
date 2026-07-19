@@ -41,11 +41,11 @@ The payload used:
 </svg>
 ```
 ## Uploading the Avatar
-![Selecting avatar.svg](https://images/02-uploading-avatar.png)
+![Selecting avatar.svg](images/02-uploading-avatar.png)
 *Figure 2: Selecting avatar.svg file for upload in the comment form*
 
 ## Burp Suite - Intercepting Upload Request
-![Burp Suite Intercept](https://images/03-burp-intercept.png)
+![Burp Suite Intercept](images/03-burp-intercept.png)
 *Figure 3: Burp Suite intercepting the POST request with the SVG payload*
 
 The request shows:
@@ -54,11 +54,11 @@ The request shows:
 * The XXE payload in the request body
 
 ## Successful Comment Submission
-![Comment Submission Success](https://images/04-comment-success.png)
+![Comment Submission Success](images/04-comment-success.png)
 *Figure 4: "Thank you for your comment!" response confirming successful upload*
 
 ## Extracted Hostname in Avatar
-![Hostname in Avatar](https://images/05-hostname-in-avatar.png)
+![Hostname in Avatar](images/05-hostname-in-avatar.png)
 *Figure 5: Hostname 1c3462a1bd38 displayed in the avatar image (visible in the comment section)*
 
 The avatar shows:
