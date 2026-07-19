@@ -121,7 +121,7 @@ Upload an image that displays the contents of the `/etc/hostname` file after pro
   <rect width="200" height="200" fill="white"/>
   <text font-size="24" x="10" y="50" fill="red" font-weight="bold">&xxe;</text>
 </svg>
-
+```
 ## Burp Suite Request Analysis
 
 ### Original Request (PNG Upload)
@@ -302,16 +302,6 @@ Enclosed Exception: The processing instruction target matching "[xX][mM][lL]" is
 | **6. View Output** | Check rendered image for extracted data |
 | **7. Submit Solution** | Submit extracted data to complete lab |
 
-## Lab Progression
-* [x] Identify upload feature
-* [x] Create SVG payload
-* [x] Upload avatar.svg
-* [x] Intercept with Burp
-* [x] Modify request
-* [x] View avatar for hostname
-* [x] Submit hostname
-
----
 
 ## Key Takeaways
 * **SVG = XML:** SVG files are processed as XML, making them vulnerable to XXE
