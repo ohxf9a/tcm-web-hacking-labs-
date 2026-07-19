@@ -1,6 +1,13 @@
-# XXE Injection Lab Write-up
+# PortSwigger Lab : XXE Injection Lab Write-up
 
 ## Overview
+
+**Vulnerability Type:** XXE Exploitation
+**Lab Link:** (https://portswigger.net/web-security/xxe/lab-exploiting-xxe-to-retrieve-files)  
+**Date:** 2026-07-18  
+**Difficulty:** Easy
+
+## Description
 
 XXE (XML External Entity Injection) is a vulnerability that occurs when XML parsers process external entities defined in the DOCTYPE declaration. Even if the application does not use these features, the underlying XML parser may still support them, creating an attack surface.
 
@@ -125,3 +132,8 @@ carlos:x:12002:12002:/home/carlos:/bin/bash
 user:x:12000:12000:/home/user:/bin/bash
 elmer:x:12099:12099:/home/elmer:/bin/bash
 academy:x:10000:10000:/academy:/bin/bash
+
+---
+
+**Author:** Water | **Date:** 2026-07-18 | **GitHub:** [@ohxf9a](https://github.com/ohxf9a)
+---
