@@ -283,7 +283,7 @@ Enclosed Exception: The processing instruction target matching "[xX][mM][lL]" is
 * **Entity References:** Make sure `&xxe;` is properly spelled in the text element
 
 ---
-**Author:** Water   
-**Date:** July 19, 2026  
-**GitHub:** [@ohxf9a](https://github.com/ohxf9a)
+**Author:** Water | **Date:** 2026-07-19 | **GitHub:** [@ohxf9a](https://github.com/ohxf9a)
+
+
 
