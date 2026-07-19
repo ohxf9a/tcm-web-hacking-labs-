@@ -132,6 +132,18 @@ carlos:x:12002:12002:/home/carlos:/bin/bash
 user:x:12000:12000:/home/user:/bin/bash
 elmer:x:12099:12099:/home/elmer:/bin/bash
 academy:x:10000:10000:/academy:/bin/bash
+```
+---
+## Key Takeaways
+
+XML parsers process external entities by default
+Even unused features can be exploited
+The DOCTYPE declaration is the injection point
+File disclosure is often the first step
+Different systems require different file paths
+Blind XXE requires different techniques (OOB, error-based, time-based)
+Always test multiple payload variations
+Information disclosure leads to privilege escalation
 
 ---
 
