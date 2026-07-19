@@ -2,6 +2,15 @@
 
 ## Overview
 
+**Vulnerability Type:**  XXE  
+**Lab Link:** https://portswigger.net/web-security/xxe/lab-xxe-via-file-upload 
+**Date:** 2026-07-19  
+**Difficulty:** Easy
+
+---
+
+## Description
+
 XXE (XML External Entity Injection) is a vulnerability that occurs when XML parsers process external entities defined in the DOCTYPE declaration. This lab demonstrates XXE exploitation through SVG image upload, where the Apache Batik library processes the SVG file and resolves external entities.
 
 ## Lab Details
@@ -272,4 +281,9 @@ Enclosed Exception: The processing instruction target matching "[xX][mM][lL]" is
 * **Check the Corners:** Extracted data may appear tiny - zoom in!
 * **Multiple Payloads:** Try different syntax if the first one fails
 * **Entity References:** Make sure `&xxe;` is properly spelled in the text element
+
+---
+**Author:** Water   
+**Date:** July 19, 2026  
+**GitHub:** [@ohxf9a](https://github.com/ohxf9a)
 
