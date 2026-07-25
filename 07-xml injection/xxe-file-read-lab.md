@@ -147,5 +147,5 @@ Information disclosure leads to privilege escalation
 
 ---
 
-**Author:** Water | **Date:** 2026-07-18 | **GitHub:** [@ohxf9a](https://github.com/ohxf9a)
+**Author:**  Water | **Date:**  2026-07-18 | **GitHub:**  [@ohxf9a](https://github.com/ohxf9a)
 ---
