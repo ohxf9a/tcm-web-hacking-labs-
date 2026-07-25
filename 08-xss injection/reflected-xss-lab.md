@@ -208,5 +208,3 @@ Execute the `print()` function in the victim's browser by exploiting a reflected
 ---
 
 **Author:** Water | **Date:** 2026-07-25 | **GitHub:** [@ohxf9a](https://github.com/ohxf9a)
-PortSwigger_Reflected_XSS_Lab_Writeup.md
-Displaying PortSwigger_Reflected_XSS_Lab_Writeup.md.
