@@ -17,19 +17,22 @@ Execute an arbitrary JavaScript payload in the victim's browser by exploiting a 
 
 ## Screenshots & Figures
 
-![Figure 1: DOM Invader identifying the document.write sink and reflected payload](DOM-Invader-sink-detection.png)
+![Figure 1: DOM Invader identifying the document.write sink and reflected payload](images/DOM-Invader-sink-detection.png)
 
 *Figure 1: DOM Invader identifying the `document.write` sink and the reflected payload.*
 
-![Figure 2: DOM Invader stack trace showing trackSearch function and document.write call](DOM-Invader-stack-trace.png)
+![Figure 2: DOM Invader stack trace showing trackSearch function and document.write call]
+(images/DOM-Invader-stack-trace.png)
 
 *Figure 2: DOM Invader's stack trace showing the `trackSearch` function and the `document.write` call.*
 
-![Figure 3: Vulnerable JavaScript code responsible for the XSS](vulnerable-javascript-code.png)
+![Figure 3: Vulnerable JavaScript code responsible for the XSS]
+(images/vulnerable-javascript-code.png)
 
 *Figure 3: The vulnerable JavaScript code responsible for the XSS.*
 
-![Figure 4: Congratulations message confirming the lab was solved](lab-solved-confirmation.png)
+![Figure 4: Congratulations message confirming the lab was solved]
+(images/lab-solved-confirmation.png)
 
 *Figure 4: Congratulations message confirming the lab was solved.*
 
