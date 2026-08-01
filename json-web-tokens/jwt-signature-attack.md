@@ -31,7 +31,7 @@ Gain access to the administrator panel and delete the user `carlos` by exploitin
 
 ![Figure 4: Crafted JWT in Repeater with modified alg and sub](images/jwt-repeater-modified-alg-sub.png)
 
-*Figure 4: The crafted JWT in the request sent to Repeater, with the algorithm changed to `none` and the subject changed to `administrator`.*
+*Figure 4: The crafted JWT in the request sent to Repeater, with the subject changed to `administrator`.*
 
 ![Figure 5: Administrator account page after forging token](images/admin-account-forged-token.png)
 
