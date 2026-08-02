@@ -49,9 +49,9 @@ Figure 7: Original account page for user wiener with the session cookie before t
 
 Figure 8: Administrator account page after successfully forging the token with the injected JWK
 
-Figure 9: Lab success message confirming the deletion of user carlos and completion of the challenge
-
 ![Figure 9: Lab success message confirming user carlos was deleted](images/lab-success-message-deleted.png)
+
+Figure 9: Lab success message confirming the deletion of user carlos and completion of the challenge
 
 ## Attack Methodology
 
